@@ -29,14 +29,16 @@ public class SignListener implements Listener {
     public void onSignChange(SignChangeEvent event) {
         String[] lines = event.getLines();
         Player player = event.getPlayer();
-        if(!(lines[0].isEmpty() && lines[1].equalsIgnoreCase("warp") && !lines[2].isEmpty()))
+        if(!(lines[1].equalsIgnoreCase("warp") && !lines[2].isEmpty()))
             return;
         if(!player.hasPermission("warpsigns2.create")) {
             player.sendMessage(ChatColor.RED + "You don't have permission to create warp signs!");
             return;
         }
-        OwnedWarp warp = manager.getWarp(player.getName(), lines[2]);
-        if(warp == null) {
+        
+        String ownerName = lines[0].isEmpty() ? player.getName() : lines[0];
+        OwnedWarp warp = manager.getWarp(ownerName, lines[2]);
+        if(warp == null || !warp.getVisible()) {
             player.sendMessage(ChatColor.RED + "That isn't a valid warp!");
             return;
         }
@@ -45,9 +47,10 @@ public class SignListener implements Listener {
             player.sendMessage(ChatColor.RED + "That isn't a valid warp!");
             return;
         }
-        event.setLine(0, player.getName());
+        event.setLine(0, ChatColor.BLUE + ownerName);
         signManager.add(ws);
-        player.sendMessage(ChatColor.GREEN + "Warp Sign created!");
+        player.sendMessage(ChatColor.GREEN + "Sign created to " + ChatColor.YELLOW + warp.getName() +
+                ChatColor.GREEN + " created!");
     }
     
     @EventHandler
